@@ -1,5 +1,6 @@
-from PyQt5.QtCore import QTimer, pyqtSignal, Qt, QSize, QPropertyAnimation
+from PyQt5.QtCore import QTimer, pyqtSignal, Qt, QSize, QPropertyAnimation, QUrl
 from PyQt5.QtGui import QIcon
+from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtWidgets import QFrame, QLabel, QPushButton, QVBoxLayout, QSizePolicy, QHBoxLayout, QGraphicsOpacityEffect
 from PyQt5.uic.properties import QtCore
 
@@ -8,11 +9,15 @@ class Timer(QTimer):
     timeout_signal = pyqtSignal()
     tick = pyqtSignal(int)
 
-    def __init__(self, duration):
+    def __init__(self, duration, play_sound_when_finished=True):
         super().__init__()
         self.duration = duration
         self.remaining_time = duration
         self.isActive = False
+
+        self.player = QMediaPlayer()
+        self.sound_file = './assets/hotel-bell-ding-1-174457.mp3'
+        self.play_sound_when_finished = play_sound_when_finished
 
         self.timeout.connect(self.update)
 
@@ -26,7 +31,15 @@ class Timer(QTimer):
             self.remaining_time -= 1
         else:
             self.stop(emit=False)
+            if self.play_sound_when_finished:
+                url = QUrl.fromLocalFile(self.sound_file)
+                content = QMediaContent(url)
+                self.player.setMedia(content)
+                self.player.setVolume(100)
+                self.player.play()
+
             self.timeout_signal.emit()
+
 
     def start(self):
         if not self.isActive:

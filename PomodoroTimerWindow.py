@@ -18,6 +18,9 @@ class PomodoroTimerWindow(QMainWindow):
         self.pages = QStackedWidget()
 
         self.timer_page = TimerPage()
+        self.timer_page.work_timer.timeout_signal.connect(self.show)
+        self.timer_page.break_timer.timeout_signal.connect(self.show)
+        self.timer_page.rest_timer.timeout_signal.connect(self.show)
 
         self.setup_page = QFrame()
         self.setup_page.setStyleSheet("background: #006311;")
