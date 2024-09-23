@@ -7,7 +7,7 @@ from TimerPage import TimerPage
 
 
 class PomodoroTimerWindow(QMainWindow):
-    def __init__(self):
+    def __init__(self, setup):
         super().__init__()
         self.setFixedSize(480, 320)
 
@@ -18,12 +18,23 @@ class PomodoroTimerWindow(QMainWindow):
 
         self.pages = QStackedWidget()
 
-        self.timer_page = TimerPage()
+        self.timer_page = TimerPage(
+            work_duration_min=setup.get('Work', 25),
+            break_duration_min=setup.get('Break', 5),
+            rest_duration_min=setup.get('Rest', 15),
+            num_reps=setup.get('num_reps', 5)
+        )
+
         self.timer_page.work_timer.timeout_signal.connect(self.show)
         self.timer_page.break_timer.timeout_signal.connect(self.show)
         self.timer_page.rest_timer.timeout_signal.connect(self.show)
 
-        self.setup_page = SetupPage()
+        self.setup_page = SetupPage(
+            work_duration_min=setup.get('Work', 25),
+            break_duration_min=setup.get('Break', 5),
+            rest_duration_min=setup.get('Rest', 15),
+            num_reps=setup.get('num_reps', 5)
+        )
 
         self.pages.addWidget(self.timer_page)
         self.pages.addWidget(self.setup_page)

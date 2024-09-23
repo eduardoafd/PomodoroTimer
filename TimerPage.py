@@ -176,7 +176,7 @@ class FadeButton(QPushButton):
 
 
 class TimerPage(QFrame):
-    def __init__(self, work_duration_min=25, rest_duration_min=5, break_duration_min=15, parent=None):
+    def __init__(self, work_duration_min=25, rest_duration_min=5, break_duration_min=15, num_reps= 5, parent=None):
         super().__init__(parent)
         self.setFixedSize(480, 320)
         self.setContentsMargins(0, 0, 0, 0)
@@ -188,7 +188,7 @@ class TimerPage(QFrame):
         self.work_duration = work_duration_min * 60
         self.break_duration = break_duration_min * 60
         self.rest_duration = rest_duration_min * 60
-        self.num_repetitions = 2
+        self.num_repetitions = num_reps
 
         self.work_timer = Timer(duration=self.work_duration)
         self.work_timer.tick.connect(self.set_time)
@@ -365,18 +365,18 @@ class TimerPage(QFrame):
 
     def set_work_duration(self, duration_min):
         self.work_duration = duration_min * 60
-        self.work_timer.duration = self.work_duration
+        self.work_timer.set_duration(self.work_duration)
         if self.current_state == 'Work' and not self.work_timer.isActive:
             self.set_time(self.work_duration)
 
     def set_break_duration(self, duration_min):
         self.break_duration = duration_min * 60
-        self.break_timer.duration = self.break_duration
+        self.break_timer.set_duration(self.break_duration)
         if self.current_state == 'Break' and not self.break_timer.isActive:
             self.set_time(self.break_duration)
 
     def set_rest_duration(self, duration_min):
         self.rest_duration = duration_min * 60
-        self.rest_timer.duration = self.rest_duration
+        self.rest_timer.set_duration(self.rest_duration)
         if self.current_state == 'Rest' and not self.rest_timer.isActive:
             self.set_time(self.rest_duration)

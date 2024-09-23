@@ -88,14 +88,14 @@ class TimerSelector(QFrame):
 
 
 class SetupPage(QFrame):
-    def __init__(self):
+    def __init__(self, work_duration_min=25, rest_duration_min=5, break_duration_min=15, num_reps= 5):
         super().__init__()
         self.setStyleSheet("background: #006311; padding: 0px;")
         self.setFixedSize(480, 320)
 
-        self.work_time_selector = TimerSelector('Work', 25, 1, 60)
-        self.break_time_selector = TimerSelector('Break', 5, 1, 15)
-        self.rest_time_selector = TimerSelector('Rest', 15, 1, 30)
+        self.work_time_selector = TimerSelector('Work', work_duration_min, 1, 60)
+        self.break_time_selector = TimerSelector('Break', break_duration_min, 1, 15)
+        self.rest_time_selector = TimerSelector('Rest', rest_duration_min, 1, 30)
 
         self.return_button = QPushButton()
         self.return_button.setFixedSize(44, 44)
