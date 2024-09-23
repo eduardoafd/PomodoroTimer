@@ -1,6 +1,7 @@
-from PyQt5.QtCore import QTimer, pyqtSignal, Qt, QSize
+from PyQt5.QtCore import QTimer, pyqtSignal, Qt, QSize, QPropertyAnimation
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QFrame, QLabel, QPushButton, QVBoxLayout, QSizePolicy, QHBoxLayout
+from PyQt5.QtWidgets import QFrame, QLabel, QPushButton, QVBoxLayout, QSizePolicy, QHBoxLayout, QGraphicsOpacityEffect
+from PyQt5.uic.properties import QtCore
 
 
 class Timer(QTimer):
@@ -24,7 +25,7 @@ class Timer(QTimer):
         if self.remaining_time > 0:
             self.remaining_time -= 1
         else:
-            self.stop()
+            self.stop(emit=False)
             self.timeout_signal.emit()
 
     def start(self):
@@ -37,10 +38,15 @@ class Timer(QTimer):
             super().stop()
             self.isActive = False
 
-    def stop(self):
+    def stop(self, emit=True):
         super().stop()
-        self.remaining_time = self.duration
-        self.isActive = False
+
+        if self.isActive:
+            self.remaining_time = self.duration
+            self.isActive = False
+
+            if emit:
+                self.timeout_signal.emit()
 
     def get_remaining_time(self, format_str=False):
         if format_str:
@@ -51,7 +57,7 @@ class Timer(QTimer):
             return self.remaining_time
 
 
-class PomodoroStates(QFrame):
+class PomodoroStateSelector(QFrame):
     selectionChanged = pyqtSignal(str)
 
     def __init__(self):
@@ -103,6 +109,61 @@ class PomodoroStates(QFrame):
         self.selectionChanged.emit(option)
 
 
+class FadeButton(QPushButton):
+    def __init__(self, normal_icon, hover_icon, parent=None):
+        super().__init__(parent)
+
+        self.setIconSize(QSize(60, 60))
+        self.setStyleSheet("background-color: transparent;")
+
+        self.normal_icon = normal_icon
+        self.hover_icon = hover_icon
+        self.setIcon(self.normal_icon)
+
+        self.setCursor(Qt.PointingHandCursor)
+
+        self.fade_out()
+
+    def enterEvent(self, event):
+        self.setIcon(self.hover_icon)
+        super().enterEvent(event)
+
+    def leaveEvent(self, event):
+        self.setIcon(self.normal_icon)
+        super().leaveEvent(event)
+
+    def mousePressEvent(self, event):
+        self.fade_out()
+        super().mousePressEvent(event)
+
+    def fade_out(self):
+        self.effect = QGraphicsOpacityEffect()
+        self.setGraphicsEffect(self.effect)
+
+        self.animation = QPropertyAnimation(self.effect, b"opacity")
+        self.animation.setDuration(250)
+        self.animation.setStartValue(1)
+        self.animation.setEndValue(0)
+        self.animation.start()
+
+        QTimer.singleShot(250, self.hide)
+
+    def show(self):
+        super().show()
+
+        QTimer.singleShot(50, self.unfade)
+
+    def unfade(self):
+        self.effect = QGraphicsOpacityEffect()
+        self.setGraphicsEffect(self.effect)
+
+        self.animation = QPropertyAnimation(self.effect, b"opacity")
+        self.animation.setDuration(250)
+        self.animation.setStartValue(0)
+        self.animation.setEndValue(1)
+        self.animation.start()
+
+
 class TimerPage(QFrame):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -112,27 +173,31 @@ class TimerPage(QFrame):
         self.setContentsMargins(0, 0, 0, 0)
         self.setStyleSheet("background: #E74C3C; padding: 0px;")
 
-        self.states = {
-            'work': 0,
-            'rest': 1,
-            'long_rest': 2,
-        }
-        self.current_state = self.states['work']
+        self.current_state = 'Work'
         self.reps_counter = 0
 
-        self.work_duration = 25 * 60
-        self.break_duration = 5 * 60
-        self.rest_duration = 15 * 60
-        self.num_repetitions = 5
+        self.work_duration = 5
+        self.break_duration = 3
+        self.rest_duration = 4
+        self.num_repetitions = 2
 
         self.work_timer = Timer(duration=self.work_duration)
         self.work_timer.tick.connect(self.set_time)
+        self.work_timer.timeout_signal.connect(self.work_finished)
 
-        self.rest_timer = Timer(duration=self.break_duration)
+        self.break_timer = Timer(duration=self.break_duration)
+        self.break_timer.tick.connect(self.set_time)
+        self.break_timer.timeout_signal.connect(lambda: self.pomodoro_states.select_option('Work'))
+
+        self.rest_timer = Timer(duration=self.rest_duration)
         self.rest_timer.tick.connect(self.set_time)
+        self.rest_timer.timeout_signal.connect(self.long_rest_finished)
 
-        self.long_rest_timer = Timer(duration=self.rest_duration)
-        self.long_rest_timer.tick.connect(self.set_time)
+        self.timers = {
+            "Work": self.work_timer,
+            "Break": self.break_timer,
+            "Rest": self.rest_timer,
+        }
 
         self.timer_display = QLabel()
         self.timer_display.setStyleSheet(
@@ -142,39 +207,91 @@ class TimerPage(QFrame):
 
         self.start_pause_button = QPushButton("Start")
         self.start_pause_button.clicked.connect(self._on_button_click)
-        self.start_pause_button.setStyleSheet(
-            "background: #ECF0F1; font-family: Inter; font-size: 28px; color: #E74C3C; border-radius: 8px;")
+        self.start_pause_button.setStyleSheet("""
+            QPushButton {
+                background: #ECF0F1;
+                font-family: Inter;
+                font-size: 28px;
+                color: #E74C3C;
+                border-radius: 8px;
+            }
+            QPushButton:hover {
+                background: #D5DBDB;  /* Change to a lighter color on hover */
+                color: #C0392B;       /* Darker text color on hover */
+            }
+            QPushButton:pressed {
+                background: #BDC3C7;  /* Change to a darker color when pressed */
+                color: #A93226;       /* Darker text color when pressed */
+            }
+            QPushButton[customState="Work"] {
+                color: #E74C3C;
+            }
+        
+            QPushButton[customState="Break"] {
+                color: #34495E;
+            }
+        
+            QPushButton[customState="Rest"] {
+                color: #1ABC9C;
+            }
+        """)
         self.start_pause_button.setFixedSize(120, 60)
         self.start_pause_button.setCursor(Qt.PointingHandCursor)
+        self.start_pause_button.setProperty('customState', 'Work')
+        self.start_pause_button.style().unpolish(self.start_pause_button)
+        self.start_pause_button.style().polish(self.start_pause_button)
+
+        self.pomodoro_states = PomodoroStateSelector()
+        self.pomodoro_states.selectionChanged.connect(self.set_state)
 
         layout = QVBoxLayout()
         layout.setAlignment(Qt.AlignCenter)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
-        # layout.addWidget(self.settings_button, alignment=Qt.AlignRight)
-        layout.addWidget(PomodoroStates(), alignment=Qt.AlignHCenter)
+        layout.addWidget(self.pomodoro_states, alignment=Qt.AlignHCenter)
         layout.addWidget(self.timer_display)
         layout.addWidget(self.start_pause_button, alignment=Qt.AlignHCenter)
 
         self.setLayout(layout)
 
-        self.settings_button = QPushButton()
+        self.settings_button = QPushButton(self)
         self.settings_button.setFixedSize(60, 60)
-        self.settings_button.setStyleSheet(
-            "QPushButton {"
-            "border-radius: 30px;"
-            "}"
-            "QPushButton:hover {"
-            "background: #B70F0F;"
-            "}"
-            "QPushButton:pressed {"
-            "background: #9C0D0D;"
-            "}")
-        self.settings_button.setIcon(QIcon("./assets/menu.svg"))
+                # background: #B70F0F;
+        self.settings_button.setStyleSheet("""
+            QPushButton {
+                border-radius: 30px;
+            }
+            QPushButton:hover {
+                background: rgba(0, 0, 0, 0.2);
+            }
+            QPushButton:pressed {
+                background: rgba(0, 0, 0, 0.1);
+            }
+        """)
+        self.settings_button.setIcon(QIcon("./assets/chef-hat.svg"))
         self.settings_button.setIconSize(QSize(40, 40))
         self.settings_button.setCursor(Qt.PointingHandCursor)
 
+        self.skip_button = FadeButton(QIcon("./assets/cutelo.svg"), QIcon("./assets/cutelo-hover.svg"), parent=self)
+        self.skip_button.clicked.connect(self.skip)
+
         self.set_time(self.work_duration)
+
+    def resizeEvent(self, event):
+        self.settings_button.move(self.width() - self.settings_button.width() - 20,
+                                  20)
+
+        self.skip_button.move(self.start_pause_button.x() + self.start_pause_button.width() + 20,
+                              self.start_pause_button.y() + (self.start_pause_button.height() - self.skip_button.height()) // 2)
+        super().resizeEvent(event)
+
+    def work_finished(self):
+        self.reps_counter += 1
+        self.pomodoro_states.select_option('Break' if self.reps_counter < self.num_repetitions else 'Rest')
+
+    def long_rest_finished(self):
+        self.reps_counter = 0
+        self.pomodoro_states.select_option('Work')
 
     def set_time(self, seconds):
         if seconds >= 0:
@@ -186,9 +303,52 @@ class TimerPage(QFrame):
             self.timer_display.setText(f"00:00")
 
     def _on_button_click(self):
-        if self.work_timer.isActive:
-            self.work_timer.pause()
+        timer = self.timers[self.current_state]
+        if timer.isActive:
+            timer.pause()
             self.start_pause_button.setText('Start')
+            self.skip_button.fade_out()
         else:
-            self.work_timer.start()
+            timer.start()
             self.start_pause_button.setText('Pause')
+            self.skip_button.show()
+
+    def skip(self):
+        if self.current_state == 'Work':
+            self.work_finished()
+
+        elif self.current_state == 'Break':
+            self.pomodoro_states.select_option('Work')
+
+        elif self.current_state == 'Rest':
+            self.pomodoro_states.select_option('Work')
+
+    def set_state(self, state):
+        self.current_state = state
+
+        self.work_timer.stop(emit=False)
+        self.break_timer.stop(emit=False)
+        self.rest_timer.stop(emit=False)
+
+        if self.current_state == 'Work':
+            self.setStyleSheet("background: #E74C3C; padding: 0px;")
+            self.set_time(self.work_duration)
+            self.start_pause_button.setProperty('customState', 'Work')
+
+        if self.current_state == 'Break':
+            self.setStyleSheet("background: #34495E; padding: 0px;")
+            self.set_time(self.break_duration)
+            self.start_pause_button.setProperty('customState', 'Break')
+
+        if self.current_state == 'Rest':
+            self.setStyleSheet("background: #1ABC9C; padding: 0px;")
+            self.set_time(self.rest_duration)
+            self.start_pause_button.setProperty('customState', 'Rest')
+
+        self.start_pause_button.style().unpolish(self.start_pause_button)
+        self.start_pause_button.style().polish(self.start_pause_button)
+
+        self.start_pause_button.setText('Start')
+        self.skip_button.fade_out()
+
+        self.update()
