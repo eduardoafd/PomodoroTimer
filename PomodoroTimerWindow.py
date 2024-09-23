@@ -32,5 +32,8 @@ class PomodoroTimerWindow(QMainWindow):
         self.layout().setAlignment(Qt.AlignCenter)
 
         self.timer_page.settings_button.clicked.connect(lambda: self.pages.setCurrentIndex(1))
+        self.setup_page.return_button.clicked.connect(lambda: self.pages.setCurrentIndex(0))
 
-        self.pages.setCurrentIndex(1)
+        self.setup_page.work_time_selector.slider.valueChanged.connect(self.timer_page.set_work_duration)
+        self.setup_page.break_time_selector.slider.valueChanged.connect(self.timer_page.set_break_duration)
+        self.setup_page.rest_time_selector.slider.valueChanged.connect(self.timer_page.set_rest_duration)
