@@ -2,7 +2,6 @@ from PyQt5.QtCore import QTimer, pyqtSignal, Qt, QSize, QPropertyAnimation, QUrl
 from PyQt5.QtGui import QIcon
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtWidgets import QFrame, QLabel, QPushButton, QVBoxLayout, QSizePolicy, QHBoxLayout, QGraphicsOpacityEffect
-from PyQt5.uic.properties import QtCore
 
 
 class Timer(QTimer):
@@ -39,7 +38,6 @@ class Timer(QTimer):
                 self.player.play()
 
             self.timeout_signal.emit()
-
 
     def start(self):
         if not self.isActive:
@@ -180,8 +178,6 @@ class FadeButton(QPushButton):
 class TimerPage(QFrame):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setContentsMargins(20, 20, 20, 20)
-
         self.setFixedSize(480, 320)
         self.setContentsMargins(0, 0, 0, 0)
         self.setStyleSheet("background: #E74C3C; padding: 0px;")
@@ -269,7 +265,7 @@ class TimerPage(QFrame):
 
         self.settings_button = QPushButton(self)
         self.settings_button.setFixedSize(60, 60)
-                # background: #B70F0F;
+        # background: #B70F0F;
         self.settings_button.setStyleSheet("""
             QPushButton {
                 border-radius: 30px;
@@ -295,7 +291,8 @@ class TimerPage(QFrame):
                                   20)
 
         self.skip_button.move(self.start_pause_button.x() + self.start_pause_button.width() + 20,
-                              self.start_pause_button.y() + (self.start_pause_button.height() - self.skip_button.height()) // 2)
+                              self.start_pause_button.y() + (
+                                          self.start_pause_button.height() - self.skip_button.height()) // 2)
         super().resizeEvent(event)
 
     def work_finished(self):

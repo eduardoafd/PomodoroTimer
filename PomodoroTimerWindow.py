@@ -2,6 +2,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QMainWindow, QStackedWidget, QFrame
 
+from SetupPage import SetupPage
 from TimerPage import TimerPage
 
 
@@ -22,15 +23,14 @@ class PomodoroTimerWindow(QMainWindow):
         self.timer_page.break_timer.timeout_signal.connect(self.show)
         self.timer_page.rest_timer.timeout_signal.connect(self.show)
 
-        self.setup_page = QFrame()
-        self.setup_page.setStyleSheet("background: #006311;")
+        self.setup_page = SetupPage()
 
         self.pages.addWidget(self.timer_page)
         self.pages.addWidget(self.setup_page)
-
-        # self.pages.setCurrentIndex(1)
 
         self.layout().addWidget(self.pages)
         self.layout().setAlignment(Qt.AlignCenter)
 
         self.timer_page.settings_button.clicked.connect(lambda: self.pages.setCurrentIndex(1))
+
+        self.pages.setCurrentIndex(1)
