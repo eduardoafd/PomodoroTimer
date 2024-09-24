@@ -64,17 +64,18 @@ class TimerSelector(QFrame):
         self.slider.setMaximum(max_value)
         self.slider.setTickInterval(1)
         self.slider.setValue(value)
-        self.slider.setFixedWidth(380)
+        self.slider.setFixedWidth(280)
 
         self.slider.valueChanged.connect(lambda val: self.value_label.setText(f"{val} min"))
 
         self.slider.setStyleSheet(slider_styleSheet)
 
         h_layout = QHBoxLayout()
-        h_layout.setSpacing(24)
+        # h_layout.setSpacing(24)
         h_layout.setContentsMargins(0, 0, 0, 0)
-        h_layout.addWidget(self.slider)
-        h_layout.addWidget(self.value_label)
+        h_layout.addWidget(self.slider, alignment=Qt.AlignLeft)
+        h_layout.addStretch()
+        h_layout.addWidget(self.value_label, alignment=Qt.AlignRight)
 
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
@@ -97,11 +98,11 @@ class SetupPage(QFrame):
         self.break_time_selector = TimerSelector('Break', break_duration_min, 1, 15)
         self.rest_time_selector = TimerSelector('Rest', rest_duration_min, 1, 30)
 
-        self.return_button = QPushButton()
-        self.return_button.setFixedSize(44, 44)
+        self.return_button = QPushButton(self)
+        self.return_button.setFixedSize(38, 38)
         self.return_button.setStyleSheet("""
                     QPushButton {
-                        border-radius: 22px;
+                        border-radius: 19px;
                         background: rgba(0, 0, 0, 0.0)
                     }
                     QPushButton:hover {
@@ -111,13 +112,14 @@ class SetupPage(QFrame):
                         background: rgba(0, 0, 0, 0.1);
                     }
                 """)
-        self.return_button.setIcon(QIcon("./assets/return.svg"))
-        self.return_button.setIconSize(QSize(32, 32))
+        self.return_button.setIcon(QIcon("./assets/chevron.svg"))
+        self.return_button.setIconSize(QSize(24, 24))
         self.return_button.setCursor(Qt.PointingHandCursor)
 
         layout = QVBoxLayout()
         layout.setSpacing(0)
-        layout.addWidget(self.return_button, alignment=Qt.AlignLeft)
+        layout.setContentsMargins(60, 40, 60, 40)
+        # layout.addWidget(self.return_button, alignment=Qt.AlignLeft)
         layout.addWidget(self.work_time_selector)
         layout.addWidget(self.break_time_selector)
         layout.addWidget(self.rest_time_selector)

@@ -284,6 +284,9 @@ class TimerPage(QFrame):
         self.skip_button = FadeButton(QIcon("./assets/cutelo.svg"), QIcon("./assets/cutelo-hover.svg"), parent=self)
         self.skip_button.clicked.connect(self.skip)
 
+        self.reps_counter_label = QLabel(f"{self.reps_counter}x", parent=self)
+        self.reps_counter_label.setStyleSheet("font-family: Inter; font-size: 24px; color: #ECF0F1; padding: 0px;")
+
         self.set_time(self.work_duration)
 
     def resizeEvent(self, event):
@@ -293,10 +296,15 @@ class TimerPage(QFrame):
         self.skip_button.move(self.start_pause_button.x() + self.start_pause_button.width() + 20,
                               self.start_pause_button.y() + (
                                           self.start_pause_button.height() - self.skip_button.height()) // 2)
+
+        self.reps_counter_label.move(20,
+                                     self.height() - self.reps_counter_label.height() - 20)
+
         super().resizeEvent(event)
 
     def work_finished(self):
         self.reps_counter += 1
+        self.reps_counter_label.setText(f"{self.reps_counter}x")
         self.pomodoro_states.select_option('Break' if self.reps_counter < self.num_repetitions else 'Rest')
 
     def long_rest_finished(self):
