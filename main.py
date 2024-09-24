@@ -45,4 +45,11 @@ if __name__ == '__main__':
     tray_icon = PomodoroTrayIcon()
     tray_icon.show()
 
+    def on_tray_icon_activated(reason):
+        if reason == 2:
+            window.show()
+
+    tray_icon.quit_action.triggered.connect(app.quit)
+    tray_icon.activated.connect(on_tray_icon_activated)
+
     app.exec_()

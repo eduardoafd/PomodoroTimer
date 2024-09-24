@@ -39,8 +39,6 @@ class PomodoroTimerWindow(QMainWindow):
         self.pages.addWidget(self.timer_page)
         self.pages.addWidget(self.setup_page)
 
-        self.pages.setCurrentIndex(1)
-
         self.layout().addWidget(self.pages)
         self.layout().setAlignment(Qt.AlignCenter)
 

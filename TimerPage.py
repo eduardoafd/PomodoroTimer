@@ -361,6 +361,8 @@ class TimerPage(QFrame):
         if self.current_state == 'Rest':
             self.setStyleSheet("background: #1ABC9C; padding: 0px;")
             self.set_time(self.rest_duration)
+            self.reps_counter = 0
+            self.reps_counter_label.setText(f"{self.reps_counter}x")
             self.start_pause_button.setProperty('customState', 'Rest')
 
         self.start_pause_button.style().unpolish(self.start_pause_button)
