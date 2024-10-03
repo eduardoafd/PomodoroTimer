@@ -53,5 +53,9 @@ if __name__ == '__main__':
     tray_icon.activated.connect(on_tray_icon_activated)
 
     window.timer_page.updateTime.connect(tray_icon.set_time)
+    tray_icon.next_action.triggered.connect(window.timer_page.skip)
+    tray_icon.pause_play_action.triggered.connect(window.timer_page.start_pause_button.click)
+    window.timer_page.setPlayPause.connect(tray_icon.set_play_pause_text)
+    tray_icon.timer_action.triggered.connect(window.show)
 
     app.exec_()

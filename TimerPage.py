@@ -177,6 +177,7 @@ class FadeButton(QPushButton):
 
 class TimerPage(QFrame):
     updateTime = pyqtSignal(tuple)
+    setPlayPause = pyqtSignal(str)
 
     def __init__(self, work_duration_min=25, rest_duration_min=5, break_duration_min=15, num_reps= 5, parent=None):
         super().__init__(parent)
@@ -331,10 +332,12 @@ class TimerPage(QFrame):
             timer.pause()
             self.start_pause_button.setText('Start')
             self.skip_button.fade_out()
+            self.setPlayPause.emit('Play')
         else:
             timer.start()
             self.start_pause_button.setText('Pause')
             self.skip_button.show()
+            self.setPlayPause.emit('Pause')
 
     def skip(self):
         if self.current_state == 'Work':
