@@ -176,6 +176,8 @@ class FadeButton(QPushButton):
 
 
 class TimerPage(QFrame):
+    updateTime = pyqtSignal(tuple)
+
     def __init__(self, work_duration_min=25, rest_duration_min=5, break_duration_min=15, num_reps= 5, parent=None):
         super().__init__(parent)
         self.setFixedSize(480, 320)
@@ -192,14 +194,17 @@ class TimerPage(QFrame):
 
         self.work_timer = Timer(duration=self.work_duration)
         self.work_timer.tick.connect(self.set_time)
+        self.work_timer.tick.connect(lambda remaining: self.updateTime.emit(('Work', remaining)))
         self.work_timer.timeout_signal.connect(self.work_finished)
 
         self.break_timer = Timer(duration=self.break_duration)
         self.break_timer.tick.connect(self.set_time)
+        self.break_timer.tick.connect(lambda remaining: self.updateTime.emit(('Break', remaining)))
         self.break_timer.timeout_signal.connect(lambda: self.pomodoro_states.select_option('Work'))
 
         self.rest_timer = Timer(duration=self.rest_duration)
         self.rest_timer.tick.connect(self.set_time)
+        self.rest_timer.tick.connect(lambda remaining: self.updateTime.emit(('Rest', remaining)))
         self.rest_timer.timeout_signal.connect(self.long_rest_finished)
 
         self.timers = {
@@ -351,16 +356,19 @@ class TimerPage(QFrame):
         if self.current_state == 'Work':
             self.setStyleSheet("background: #E74C3C; padding: 0px;")
             self.set_time(self.work_duration)
+            self.updateTime.emit(('Work', self.work_duration))
             self.start_pause_button.setProperty('customState', 'Work')
 
         if self.current_state == 'Break':
             self.setStyleSheet("background: #34495E; padding: 0px;")
             self.set_time(self.break_duration)
+            self.updateTime.emit(('Break', self.break_duration))
             self.start_pause_button.setProperty('customState', 'Break')
 
         if self.current_state == 'Rest':
             self.setStyleSheet("background: #1ABC9C; padding: 0px;")
             self.set_time(self.rest_duration)
+            self.updateTime.emit(('Rest', self.rest_duration))
             self.reps_counter = 0
             self.reps_counter_label.setText(f"{self.reps_counter}x")
             self.start_pause_button.setProperty('customState', 'Rest')

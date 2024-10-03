@@ -29,4 +29,14 @@ class PomodoroTrayIcon(QSystemTrayIcon):
 
         self.setContextMenu(self.menu)
 
+    def set_time(self, update):
+        state, time = update
+        if time >= 0:
+            minutes = time // 60
+            remaining_seconds = time % 60
+
+            self.timer_status.setText(f"{state}: {minutes:02}:{remaining_seconds:02}")
+        else:
+            pass
+
 

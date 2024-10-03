@@ -52,4 +52,6 @@ if __name__ == '__main__':
     tray_icon.quit_action.triggered.connect(app.quit)
     tray_icon.activated.connect(on_tray_icon_activated)
 
+    window.timer_page.updateTime.connect(tray_icon.set_time)
+
     app.exec_()
