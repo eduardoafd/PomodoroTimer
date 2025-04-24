@@ -15,7 +15,7 @@ class Timer(QTimer):
         self.isActive = False
 
         self.player = QMediaPlayer()
-        self.sound_file = './assets/hotel-bell-ding-1-174457.mp3'
+        self.sound_file = '../assets/hotel-bell-ding-1-174457.mp3'
         self.play_sound_when_finished = play_sound_when_finished
 
         self.timeout.connect(self.update)
@@ -283,11 +283,11 @@ class TimerPage(QFrame):
                 background: rgba(0, 0, 0, 0.1);
             }
         """)
-        self.settings_button.setIcon(QIcon("./assets/chef-hat.svg"))
+        self.settings_button.setIcon(QIcon("../assets/chef-hat.svg"))
         self.settings_button.setIconSize(QSize(40, 40))
         self.settings_button.setCursor(Qt.PointingHandCursor)
 
-        self.skip_button = FadeButton(QIcon("./assets/cutelo.svg"), QIcon("./assets/cutelo-hover.svg"), parent=self)
+        self.skip_button = FadeButton(QIcon("../assets/cutelo.svg"), QIcon("../assets/cutelo-hover.svg"), parent=self)
         self.skip_button.clicked.connect(self.skip)
 
         self.reps_counter_label = QLabel(f"{self.reps_counter}x", parent=self)

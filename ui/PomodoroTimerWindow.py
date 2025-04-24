@@ -2,8 +2,8 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QMainWindow, QStackedWidget, QFrame
 
-from SetupPage import SetupPage
-from TimerPage import TimerPage
+from ui.SetupPage import SetupPage
+from ui.TimerPage import TimerPage
 
 
 class PomodoroTimerWindow(QMainWindow):
@@ -12,7 +12,7 @@ class PomodoroTimerWindow(QMainWindow):
         self.setFixedSize(480, 320)
 
         self.setWindowTitle('Pomodoro Timer')
-        self.setWindowIcon(QIcon("./assets/tomato.svg"))
+        self.setWindowIcon(QIcon("../assets/tomato.svg"))
 
         self.setStyleSheet("background: #E74C3C;")
 

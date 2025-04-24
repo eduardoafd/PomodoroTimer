@@ -112,7 +112,7 @@ class SetupPage(QFrame):
                         background: rgba(0, 0, 0, 0.1);
                     }
                 """)
-        self.return_button.setIcon(QIcon("./assets/chevron.svg"))
+        self.return_button.setIcon(QIcon("../assets/chevron.svg"))
         self.return_button.setIconSize(QSize(24, 24))
         self.return_button.setCursor(Qt.PointingHandCursor)
 

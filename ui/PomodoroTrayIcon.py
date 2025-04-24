@@ -8,7 +8,7 @@ class PomodoroTrayIcon(QSystemTrayIcon):
 
         super(PomodoroTrayIcon, self).__init__()
 
-        self.setIcon(QIcon("./assets/tomato.svg"))
+        self.setIcon(QIcon("../assets/tomato.svg"))
         self.setVisible(True)
 
         self.menu= QMenu()

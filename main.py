@@ -5,8 +5,8 @@ import sys
 from PyQt5.QtCore import QSharedMemory
 from PyQt5.QtWidgets import QApplication
 
-from PomodoroTimerWindow import PomodoroTimerWindow
-from PomodoroTrayIcon import PomodoroTrayIcon
+from ui.PomodoroTimerWindow import PomodoroTimerWindow
+from ui.PomodoroTrayIcon import PomodoroTrayIcon
 
 DEFAULT_SETUP = {
     'Work': 15,
@@ -16,12 +16,12 @@ DEFAULT_SETUP = {
 }
 
 pomodoro_setup = None
-if os.path.isfile('pomodoro_setup.json'):
-    with open('pomodoro_setup.json', 'r') as f:
+if os.path.isfile('config/pomodoro_setup.json'):
+    with open('config/pomodoro_setup.json', 'r') as f:
         pomodoro_setup = json.load(f)
 else:
     try:
-        json.dump(DEFAULT_SETUP, open('pomodoro_setup.json', 'w'))
+        json.dump(DEFAULT_SETUP, open('config/pomodoro_setup.json', 'w'))
         pomodoro_setup = DEFAULT_SETUP
     except Exception as e:
         print("Failed to save pomodoro_setup.json")
